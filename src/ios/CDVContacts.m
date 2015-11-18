@@ -48,7 +48,7 @@
     NSString* callbackId = command.callbackId;
 
     CDVAddressBookHelper* abHelper = [[CDVAddressBookHelper alloc] init];
-    CDVContacts* __weak weakSelf = self;  // play it safe to avoid retain cycles
+    __weak CDVContacts* weakSelf = self;  // play it safe to avoid retain cycles
 
     [abHelper createAddressBook: ^(ABAddressBookRef addrBook, CDVAddressBookAccessError* errCode) {
         if (addrBook == NULL) {
@@ -59,7 +59,7 @@
         npController.addressBook = addrBook;     // a CF retaining assign
         CFRelease(addrBook);
 
-        npController.newPersonViewDelegate = self;
+        npController.newPersonViewDelegate = weakSelf;
         npController.callbackId = callbackId;
 
         UINavigationController* navController = [[UINavigationController alloc] initWithRootViewController:npController];
@@ -105,7 +105,7 @@
     bool bEdit = [options isKindOfClass:[NSNull class]] ? false : [self existsValue:options val:@"true" forKey:@"allowsEditing"];
 
     CDVAddressBookHelper* abHelper = [[CDVAddressBookHelper alloc] init];
-    CDVContacts* __weak weakSelf = self;  // play it safe to avoid retain cycles
+    __weak CDVContacts* weakSelf = self;  // play it safe to avoid retain cycles
 
     [abHelper createAddressBook: ^(ABAddressBookRef addrBook, CDVAddressBookAccessError* errCode) {
         if (addrBook == NULL) {
@@ -119,7 +119,7 @@
         if (rec) {
             CDVDisplayContactViewController* personController = [[CDVDisplayContactViewController alloc] init];
             personController.displayedPerson = rec;
-            personController.personViewDelegate = self;
+            personController.personViewDelegate = weakSelf;
             personController.allowsEditing = NO;
 
             // create this so DisplayContactViewController will have a "back" button.
@@ -128,13 +128,13 @@
 
             [navController pushViewController:personController animated:YES];
 
-            [self.viewController presentViewController:navController animated:YES completion:nil];
+            [weakSelf.viewController presentViewController:navController animated:YES completion:nil];
 
             if (bEdit) {
                 // create the editing controller and push it onto the stack
                 ABPersonViewController* editPersonController = [[ABPersonViewController alloc] init];
                 editPersonController.displayedPerson = rec;
-                editPersonController.personViewDelegate = self;
+                editPersonController.personViewDelegate = weakSelf;
                 editPersonController.allowsEditing = YES;
                 [navController pushViewController:editPersonController animated:YES];
             }
@@ -392,7 +392,7 @@
 
     [self.commandDelegate runInBackground:^{
         CDVAddressBookHelper* abHelper = [[CDVAddressBookHelper alloc] init];
-        CDVContacts* __weak weakSelf = self;     // play it safe to avoid retain cycles
+        __weak CDVContacts* weakSelf = self;     // play it safe to avoid retain cycles
 
         [abHelper createAddressBook: ^(ABAddressBookRef addrBook, CDVAddressBookAccessError* errorCode) {
             CDVPluginResult* result = nil;
@@ -463,7 +463,7 @@
     NSNumber* cId = [command argumentAtIndex:0];
 
     CDVAddressBookHelper* abHelper = [[CDVAddressBookHelper alloc] init];
-    CDVContacts* __weak weakSelf = self;  // play it safe to avoid retain cycles
+    __weak CDVContacts* weakSelf = self;  // play it safe to avoid retain cycles
 
     [abHelper createAddressBook: ^(ABAddressBookRef addrBook, CDVAddressBookAccessError* errorCode) {
         CDVPluginResult* result = nil;
